@@ -38,6 +38,7 @@ module.exports = {
         image: result.secure_url,
         cloudinaryId: result.public_id,
         caption: req.body.caption,
+        videoUrl: req.body.videoUrl || "", // Use empty string if no video URL is provided
         likes: 0,
         user: req.user.id,
       });

@@ -7,15 +7,24 @@ const PostSchema = new mongoose.Schema({
   },
   image: {
     type: String,
-    require: true,
+    required: true,
   },
   cloudinaryId: {
     type: String,
-    require: true,
+    required: true,
   },
   caption: {
     type: String,
     required: true,
+  },
+  videoUrl: {
+    type: String,
+    validate: {
+      validator: function (v) {
+        return /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/.+$/.test(v);
+      },
+      message: "Invalid YouTube URL",
+    },
   },
   likes: {
     type: Number,
