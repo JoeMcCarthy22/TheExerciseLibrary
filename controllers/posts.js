@@ -1,5 +1,6 @@
 const cloudinary = require("../middleware/cloudinary");
 const Post = require("../models/Post");
+const Favourite = require("../models/favourite");
 
 module.exports = {
   getProfile: async (req, res) => { 
@@ -48,6 +49,25 @@ module.exports = {
       console.log(err);
     }
   },
+  favouritePost: async (req, res) => {
+    try {
+  
+      if (!req.user) {
+        return res.status(401).send("User not authenticated");
+      }
+  
+      await Favourite.create({
+        user: req.user.id,
+        post: req.params.id, // Fixing post reference
+      });
+  
+      console.log("✅ Post has been favourited!");
+      res.redirect(`/post/${req.params.id}`);
+    } catch (err) {
+      console.error("❌ Error in favouritePost:", err);
+      res.status(500).send("Server error");
+    }
+  },  
   likePost: async (req, res) => {
     try {
       await Post.findOneAndUpdate(
