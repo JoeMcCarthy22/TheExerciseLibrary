@@ -51,23 +51,35 @@ module.exports = {
   },
   favouritePost: async (req, res) => {
     try {
-  
+      // Ensure user is authenticated
       if (!req.user) {
         return res.status(401).send("User not authenticated");
       }
   
-      await Favourite.create({
+      // Check if the favourite already exists
+      const existingFavourite = await Favourite.findOne({
         user: req.user.id,
-        post: req.params.id, // Fixing post reference
+        post: req.params.id,
       });
   
-      console.log("✅ Post has been favourited!");
-      res.redirect(`/post/${req.params.id}`);
+      if (existingFavourite) {
+        console.log("⚠️ Post is already in favourites.");
+      } else {
+        // Create favourite if it doesn't exist
+        await Favourite.create({
+          user: req.user.id,
+          post: req.params.id,
+        });
+        console.log("✅ Post has been favourited!");
+      }
+  
+      // Redirect back to the post or the previous page
+      res.redirect(req.headers.referer || `/post/${req.params.id}`);
     } catch (err) {
       console.error("❌ Error in favouritePost:", err);
       res.status(500).send("Server error");
     }
-  },  
+  },    
   likePost: async (req, res) => {
     try {
       await Post.findOneAndUpdate(

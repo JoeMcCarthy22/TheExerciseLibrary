@@ -1,0 +1,60 @@
+<%- include('partials/header') -%>
+
+<div class="container mt-5">
+  <h1 class="text-center">Latest Exercises</h1>
+
+  <!-- Loop through the latest posts -->
+  <div class="row">
+    <% posts.forEach(post => { %>
+      <div class="col-md-6 mb-4">
+        <div class="card">
+          <!-- Post Title -->
+          <h3 class="card-header"><%= post.title %></h3>
+
+          <!-- Display Image -->
+          <img class="card-img-top" src="<%= post.image %>" alt="Exercise Image">
+
+          <div class="card-body">
+            <!-- Video (if available) -->
+            <% if (post.videoUrl) { %>
+              <div class="embed-responsive embed-responsive-16by9 mb-3">
+                <iframe 
+                  class="embed-responsive-item"
+                  src="https://www.youtube.com/embed/<%= post.videoUrl.split('v=')[1].split('&')[0] %>"
+                  frameborder="0" 
+                  allowfullscreen>
+                </iframe>
+              </div>
+            <% } %>
+
+            <!-- Caption -->
+            <p><%= post.caption %></p>
+
+            <!-- Likes and Actions -->
+            <div class="d-flex justify-content-between align-items-center">
+              <form action="/post/likePost/<%= post._id %>?_method=PUT" method="POST">
+                <button class="btn btn-primary fa fa-heart" type="submit"></button>
+              </form>
+
+              <form action="/post/favouritePost/<%= post._id %>" method="POST">
+                <button class="btn btn-primary fa fa-star" type="submit">Favourite</button>
+              </form>
+
+              <h5>Likes: <%= post.likes %></h5>
+
+              <a href="/post/<%= post._id %>" class="btn btn-secondary">View Post</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% }) %>
+  </div>
+
+  <!-- Navigation -->
+  <div class="text-center mt-5">
+    <a class="btn btn-primary" href="/profile">Return to Profile</a>
+  </div>
+
+</div>
+
+<%- include('partials/footer') -%>
