@@ -1,0 +1,15 @@
+<h1>Your Favourites</h1>
+<% if (posts && posts.length > 0) { %>
+  <ul>
+    <% posts.forEach(favourite => { %>
+      <li>
+        <h3><%= favourite.post.title %></h3>
+        <img src="<%= favourite.post.image %>" alt="<%= favourite.post.title %>" />
+        <p><%= favourite.post.caption %></p>
+        <a href="/post/<%= favourite.post._id %>">View Post</a>
+      </li>
+    <% }); %>
+  </ul>
+<% } else { %>
+  <p>You have no favourites yet.</p>
+<% } %>

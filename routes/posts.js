@@ -9,9 +9,13 @@ const { ensureAuth } = require("../middleware/auth");
 //post/:id, post/createPost, post/likePost/:id, post/deletePost/:id
 router.get("/:id", ensureAuth, postsController.getPost);
 
+//Enables user to display favourite'd posts
+router.get("/favourites", ensureAuth, postsController.getFavourites);
+
 //Enables user to create post w/ cloudinary for media uploads
 router.post("/createPost", upload.single("file"), postsController.createPost);
 
+//Enables user to add post to favourites
 router.post("/favouritePost/:id", ensureAuth, postsController.favouritePost);
 
 //Enables user to like post. In controller, uses POST model to update likes by 1

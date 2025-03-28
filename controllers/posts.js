@@ -56,6 +56,9 @@ module.exports = {
         return res.status(401).send("User not authenticated");
       }
   
+      // Log the ID to check if it's valid
+      console.log("Post ID to favourite:", req.params.id);
+  
       // Check if the favourite already exists
       const existingFavourite = await Favourite.findOne({
         user: req.user.id,
@@ -79,7 +82,7 @@ module.exports = {
       console.error("❌ Error in favouritePost:", err);
       res.status(500).send("Server error");
     }
-  },    
+  },  
   likePost: async (req, res) => {
     try {
       await Post.findOneAndUpdate(
@@ -108,4 +111,21 @@ module.exports = {
       res.redirect("/profile");
     }
   },
-};
+  getFavourites: async (req, res) => {
+    console.log("User ID: ", req.user.id);  // Log the user ID here
+    try {
+      const favouritedPosts = await Favourite.find({ user: req.user.id }).populate("post");
+      console.log("Favourited posts found:", favouritedPosts);
+      res.render("favourites.ejs", { posts: favouritedPosts, user: req.user });
+    } catch (err) {
+      console.log("❌ Error fetching favourites:", err);
+      res.status(500).send("Server Error");
+    }
+  }
+  
+  
+  
+  
+  
+}
+
