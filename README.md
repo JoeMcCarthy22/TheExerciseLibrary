@@ -1,5 +1,6 @@
 # TheExerciseLibrary
-https://theexerciselibrary.onrender.com/
+[Visit The Exercise Library](https://theexerciselibrary.onrender.com/)
+
 
 A full-stack Social Networking site that allows users to share exercises with each other.
 (Still in development, although core functionality is present)
