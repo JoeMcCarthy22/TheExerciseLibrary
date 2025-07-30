@@ -4,7 +4,7 @@ const Favourite = require("../models/Favourite");
 
 module.exports = {
   getProfile: async (req, res) => { 
-    console.log(req.user)
+    console.log(req.user);
     try {
       const posts = await Post.find({ user: req.user.id });
       res.render("profile.ejs", { posts: posts, user: req.user });
@@ -12,6 +12,7 @@ module.exports = {
       console.log(err);
     }
   },
+
   getPost: async (req, res) => {
     try {
       const post = await Post.findById(req.params.id);
@@ -20,6 +21,7 @@ module.exports = {
       console.log(err);
     }
   },
+
   createPost: async (req, res) => {
     try {
       const result = await cloudinary.uploader.upload(req.file.path);
@@ -38,6 +40,7 @@ module.exports = {
       console.log(err);
     }
   },
+
   favouritePost: async (req, res) => {
     try {
       if (!req.user) {
@@ -62,7 +65,8 @@ module.exports = {
       console.error("❌ Error in favouritePost:", err);
       res.status(500).send("Server error");
     }
-  },  
+  },
+
   likePost: async (req, res) => {
     try {
       await Post.findOneAndUpdate(
@@ -75,6 +79,7 @@ module.exports = {
       console.log(err);
     }
   },
+
   deletePost: async (req, res) => {
     try {
       let post = await Post.findById({ _id: req.params.id });
@@ -86,15 +91,38 @@ module.exports = {
       res.redirect("/profile");
     }
   },
+
   getFavourites: async (req, res) => {
     try {
-        const favourites = await Favourite.find({ user: req.user.id }).populate("post");
-        res.render("favourites.ejs", { favourites }); // Pass favourites directly
+      const favourites = await Favourite.find({ user: req.user.id }).populate("post");
+      res.render("favourites.ejs", { favourites });
     } catch (err) {
-        console.error(err);
-        res.status(500).send("Server Error");
+      console.error(err);
+      res.status(500).send("Server Error");
     }
-}
+  },
 
-}
+  // New helper: Get post by ID (for API)
+  getPostById: async (id) => {
+    try {
+      return await Post.findById(id);
+    } catch (err) {
+      console.error(err);
+      return null;
+    }
+  },
 
+  // New helper: Increment likes and return updated post (for API)
+  incrementLikes: async (id) => {
+    try {
+      return await Post.findByIdAndUpdate(
+        id,
+        { $inc: { likes: 1 } },
+        { new: true }
+      );
+    } catch (err) {
+      console.error(err);
+      return null;
+    }
+  }
+};
