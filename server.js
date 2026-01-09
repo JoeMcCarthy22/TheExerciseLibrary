@@ -1,49 +1,48 @@
 const express = require("express");
 const app = express();
+const mongoose = require("mongoose");
 const passport = require("passport");
 const session = require("express-session");
 const MongoStore = require("connect-mongo")(session);
 const methodOverride = require("method-override");
 const flash = require("express-flash");
 const logger = require("morgan");
-
-// Routes & DB
 const connectDB = require("./config/database");
 const mainRoutes = require("./routes/main");
 const postRoutes = require("./routes/posts");
 
-// Load environment variables from config/.env
-require("dotenv").config({ path: "./config/.env" });
+// Load .env from root
+require("dotenv").config(); // no path needed if .env is in root
 
 // Passport config
 require("./config/passport")(passport);
 
-// Connect to MongoDB
+// Connect to Database
 connectDB();
 
-// Set view engine
+// Using EJS for views
 app.set("view engine", "ejs");
 
-// Static folder
+// Static Folder
 app.use(express.static("public"));
 
-// Body parsing
+// Body Parsing
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 // Logging
 app.use(logger("dev"));
 
-// Override for PUT/DELETE
+// Use forms for put / delete
 app.use(methodOverride("_method"));
 
-// Sessions stored in MongoDB
+// Setup Sessions - stored in MongoDB
 app.use(
   session({
     secret: "keyboard cat",
     resave: false,
     saveUninitialized: false,
-    store: new MongoStore({ mongooseConnection: require("mongoose").connection }),
+    store: new MongoStore({ mongooseConnection: mongoose.connection }),
   })
 );
 
@@ -51,20 +50,18 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Flash messages
+// Use flash messages for errors, info, etc.
 app.use(flash());
 
-// Routes
+// Setup Routes
 app.use("/", mainRoutes);
 app.use("/post", postRoutes);
 
-// Set port from environment or fallback to 9000
+// Server Running
 const PORT = process.env.PORT || 9000;
-
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
-
 
 
 
