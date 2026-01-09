@@ -1,0 +1,96 @@
+<%- include('partials/header') -%>
+
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-8">
+      <h2><%= post.title %></h2>
+
+      <img class="img-fluid" src="<%= post.image %>" />
+
+      <% if (post.videoUrl) { %>
+        <div class="embed-responsive embed-responsive-16by9 mt-4">
+          <iframe class="embed-responsive-item"
+            src="https://www.youtube.com/embed/<%= post.videoUrl.split('v=')[1].split('&')[0] %>"
+            frameborder="0" allowfullscreen></iframe>
+        </div>
+      <% } %>
+
+      <p class="mt-4"><%= post.caption %></p>
+
+      <!-- Buttons row -->
+      <div class="d-flex justify-content-between align-items-center mt-4">
+        <div id="like-button-<%= post._id %>"></div>
+
+        <form action="/post/favouritePost/<%= post._id %>" method="POST" class="m-0">
+          <button class="btn btn-primary fa fa-star" type="submit"> Favourite</button>
+        </form>
+
+        <% if (post.user == user.id) { %>
+          <form action="/post/deletePost/<%= post._id %>?_method=DELETE" method="POST" class="m-0">
+            <button class="btn btn-danger fa fa-trash" type="submit"></button>
+          </form>
+        <% } %>
+      </div>
+
+      <!-- Navigation -->
+      <div class="d-flex justify-content-center gap-3 mt-5">
+        <a class="btn btn-secondary" href="/profile">Return to Profile</a>
+        <a class="btn btn-secondary" href="/feed">Return to Feed</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('partials/footer') -%>
+
+<!-- React Like Button Script -->
+<script>
+  const { useState, useEffect } = React;
+
+  function LikeButton(props) {
+    const [likes, setLikes] = useState(0);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+      fetch('/post/' + props.postId + '/likes')
+        .then(res => res.json())
+        .then(data => {
+          setLikes(data.count);
+          setLoading(false);
+        })
+        .catch(() => setLoading(false));
+    }, [props.postId]);
+
+    const handleLike = () => {
+      fetch('/post/' + props.postId + '/like', { method: 'POST' })
+        .then(res => res.json())
+        .then(data => setLikes(data.count))
+        .catch(err => console.error('Failed to like:', err));
+    };
+
+    if (loading) return React.createElement('div', null, 'Loading...');
+
+    return React.createElement(
+      'div',
+      { className: 'd-flex align-items-center' },
+      React.createElement(
+        'button',
+        {
+          className: 'btn btn-primary fa fa-heart',
+          onClick: handleLike,
+          style: { fontSize: '1.5rem' },
+        },
+        null
+      ),
+      React.createElement(
+        'span',
+        { style: { marginLeft: '10px', fontSize: '1.2rem' } },
+        likes + ' Likes'
+      )
+    );
+  }
+
+  ReactDOM.createRoot(document.getElementById('like-button-<%= post._id %>')).render(
+    React.createElement(LikeButton, { postId: '<%= post._id %>' })
+  );
+</script>

@@ -1,0 +1,32 @@
+<%- include('partials/header') -%>
+
+<div class="container mt-5">
+  <h1 class="text-center mb-5">Your Favourites</h1>
+
+  <% if (favourites && favourites.some(fav => fav.post)) { %>
+    <div class="row">
+      <% favourites.forEach(favourite => { %>
+        <% if (favourite.post) { %>
+          <div class="col-md-6 mb-4">
+            <div class="card">
+              <h3 class="card-header"><%= favourite.post.title %></h3>
+
+              <% if (favourite.post.image) { %>
+                <img src="<%= favourite.post.image %>" alt="<%= favourite.post.title %>" class="card-img-top" />
+              <% } %>
+
+              <div class="card-body">
+                <p><%= favourite.post.caption %></p>
+                <a href="/post/<%= favourite.post._id %>" class="btn btn-secondary">View Post</a>
+              </div>
+            </div>
+          </div>
+        <% } %>
+      <% }); %>
+    </div>
+  <% } else { %>
+    <p class="text-center">You have no favourites yet.</p>
+  <% } %>
+</div>
+
+<%- include('partials/footer') -%>

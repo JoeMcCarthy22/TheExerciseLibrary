@@ -1,0 +1,119 @@
+<%- include('partials/header') -%>
+
+<div class="container mt-5">
+  <!-- Show Favourites Button -->
+  <div class="text-right mb-4">
+    <a href="/post/favourites" class="btn btn-warning">
+      <i class="fa fa-star"></i> Show Favourites
+    </a>
+  </div>
+
+  <!-- Navigation -->
+  <div class="text-right mt-5">
+    <a class="btn btn-primary" href="/profile">Return to Profile</a>
+  </div>
+
+  <h1 class="text-center mb-5">Latest Exercises</h1>
+
+  <!-- Loop through posts -->
+  <div class="row">
+    <% posts.forEach(post => { %>
+      <div class="col-md-6 mb-4">
+        <div class="card">
+          <h3 class="card-header"><%= post.title %></h3>
+          <img class="card-img-top" src="<%= post.image %>" alt="Exercise Image">
+
+          <div class="card-body">
+            <% if (post.videoUrl) { %>
+              <div class="embed-responsive embed-responsive-16by9 mb-3">
+                <iframe 
+                  class="embed-responsive-item"
+                  src="https://www.youtube.com/embed/<%= post.videoUrl.split('v=')[1].split('&')[0] %>"
+                  frameborder="0" 
+                  allowfullscreen>
+                </iframe>
+              </div>
+            <% } %>
+
+            <p><%= post.caption %></p>
+
+            <div class="d-flex justify-content-between align-items-center">
+              <!-- Like button container with unique ID -->
+              <div id="react-like-button-<%= post._id %>" class="col-4" data-post-id="<%= post._id %>"></div>
+
+              <form action="/post/favouritePost/<%= post._id %>" method="POST">
+                <button class="btn btn-primary fa fa-star" type="submit">Favourite</button>
+              </form>
+              
+              <a href="/post/<%= post._id %>" class="btn btn-secondary">View Post</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% }) %>
+  </div>
+
+  <div class="text-center mt-5">
+    <a class="btn btn-primary" href="/profile">Return to Profile</a>
+  </div>
+</div>
+
+<script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+
+<script>
+  const { useState, useEffect } = React;
+
+  function LikeButton(props) {
+    const [likes, setLikes] = useState(0);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+      fetch('/post/' + props.postId + '/likes')
+        .then(res => res.json())
+        .then(data => {
+          setLikes(data.count);
+          setLoading(false);
+        })
+        .catch(() => setLoading(false));
+    }, [props.postId]);
+
+    const handleLike = () => {
+      fetch('/post/' + props.postId + '/like', { method: 'POST' })
+        .then(res => res.json())
+        .then(data => setLikes(data.count))
+        .catch(err => console.error('Failed to like:', err));
+    };
+
+    if (loading) return React.createElement('div', null, 'Loading...');
+
+    return React.createElement(
+      'div',
+      { className: 'd-flex align-items-center' },
+      React.createElement(
+        'button',
+        {
+          className: 'btn btn-primary fa fa-heart',
+          onClick: handleLike,
+          style: { fontSize: '1.5rem' },
+        },
+        null
+      ),
+      React.createElement(
+        'span',
+        { style: { marginLeft: '10px', fontSize: '1.2rem' } },
+        likes + ' Likes'
+      )
+    );
+  }
+
+  // For each like button container, render the LikeButton React component
+  document.querySelectorAll('[id^="react-like-button-"]').forEach(container => {
+    const postId = container.getAttribute('data-post-id');
+    ReactDOM.createRoot(container).render(
+      React.createElement(LikeButton, { postId: postId })
+    );
+  });
+</script>
+
+<%- include('partials/footer') -%>
