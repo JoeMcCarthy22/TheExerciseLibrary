@@ -11,7 +11,7 @@ const connectDB = require("./config/database");
 const mainRoutes = require("./routes/main");
 const postRoutes = require("./routes/posts");
 
-// Load .env from root
+// Load .env from roots
 require("dotenv").config(); // no path needed if .env is in root
 
 // Passport config
