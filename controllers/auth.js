@@ -116,3 +116,14 @@ exports.postSignup = (req, res, next) => {
     }
   );
 };
+
+const handleGuestLogin = async () => {
+  try {
+    await login({
+      email: "Test@Test.com",
+      password: "test1234"
+    });
+  } catch (error) {
+    console.error("Guest login failed:", error);
+  }
+};
